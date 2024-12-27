@@ -118,7 +118,7 @@ class Shader:
             vs = file_utilities.load_file_as_string(self.vs_path)
             fs = self.fs
             
-            self.debug_print(fs)
+            #self.debug_print(fs)
 
             if fs and vs:
                 program = self.context.program(

@@ -20,4 +20,6 @@ I'll supply packages when I've worked out how to do CI/CD on github.
 3. Marvel at your creation
 
 
+### What is currently broken:
+* textures are not handled during shader reload,  this means adding/removing/changing paths does not hotload 
 

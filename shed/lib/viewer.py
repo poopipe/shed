@@ -25,15 +25,14 @@ class ImageTexture:
         self.sampler = self.context.sampler(texture = self.texture)
 
     def _load(self):
-        print(os.path.abspath(self.path))
-        if os.path.exists(self.path):
-            print(self.path, 'exists')
-        else:
-            print(self.path, 'doesnt exist')
-        img = cv2.imread(self.path)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # optional
-        #img = np.flip(img, 0).copy(order='C')      # optional
-        return self.context.texture(img.shape[1::-1], img.shape[2], img)
+        try:
+            img = cv2.imread(self.path)
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # optional
+            #img = np.flip(img, 0).copy(order='C')      # optional
+            return self.context.texture(img.shape[1::-1], img.shape[2], img)
+        except Exception as e:
+            print(f'Failed to load texture {self.path}')
+            print(e)
 
     def use(self, id):
         self.sampler.use(id)
@@ -115,6 +114,8 @@ class Scene:
         return vao
 
     def reload_shader_program(self):
+        # TODO:
+        # Handle Textures during shader load - currently doesn't work
         try:
             self.shader_file = ShaderFile.ShaderFile(self.fragment_shader_path)
             self.shader = shader_utilities.Shader(self.context, self.fragment_shader_path, self.shader_file, self.use_v_color)
