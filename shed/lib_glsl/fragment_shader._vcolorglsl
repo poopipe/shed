@@ -1,0 +1,7 @@
+void main() {
+  out_color = vec4(v_color, 1.0) + vec4(saturate(v_uv.x - 1.0), saturate(v_uv.y - 1.0), 0.0, 0.0);
+  }
+ 
+
+
+
