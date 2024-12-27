@@ -29,7 +29,7 @@ float sd_circle(vec2 pos, vec2 center, float radius){
 
 float sd_rounded_box(vec2 pos, vec2 center, vec2 size, vec4 radius){
   // b = size
-  // r = corner roundness top right, bottom right, top left, bottom left
+  // r = corner roundness bottom right, top right, bottom left, top left
   pos -= center;
   radius.xy = (pos.x > 0.0) ? radius.xy : radius.zw;
   radius.x = (pos.y > 0.0) ? radius.x : radius.y;
@@ -44,6 +44,12 @@ float sd_box(vec2 pos, vec2 center, vec2 size){
   return length(max(d, 0.0)) + min( max(d.x, d.y), 0.0);
 }
 
+vec3 sdg_circle(vec2 pos, vec2 center, float radius){
+  // circle with direction
+  pos -= center;
+  float d = length(pos);
+  return vec3( d - radius, pos / d);
+}
 
 // visualisation
 vec3 sd_visualise(float sd){

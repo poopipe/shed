@@ -16,6 +16,7 @@ from . import shader_utilities
 from . import mesh_utilities
 from . import ShaderFile
 from .. import LIB_GLSL_ROOT
+from .. import LIB_RESOURCE_ROOT
 
 class ImageTexture:
     def __init__(self, path):
@@ -183,8 +184,6 @@ class Scene:
         value = data[v_pos][u_pos]
         print(f'mouse: ({u_pos}, {v_pos}) color: ({value[0]}, {value[1]}, {value[2]})')
 
-
-
     def _get_shader_file_watchers(self):
         if self.shader.fs_includes:
             file_list = self.shader.fs_includes
@@ -223,6 +222,10 @@ class Scene:
 def main(frag_path):
     pygame.init()
     pygame_screen = pygame.display.set_mode((800, 800), flags=pygame.OPENGL | pygame.DOUBLEBUF | pygame.RESIZABLE, vsync=True)
+
+    icon = pygame.image.load(os.path.join(LIB_RESOURCE_ROOT,'icon.png'))
+    pygame.display.set_icon(icon)
+
     pygame.display.set_caption(frag_path)
     clock = pygame.time.Clock()
     start_time = time.time()
