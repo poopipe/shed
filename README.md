@@ -3,7 +3,7 @@ This a bit like shadertoy but you can use your own text editor and it's written 
 
 
 Usage:
-Build the code into a package and install it. You can then run it using python3 -m shed -f 'path to fragment shader file'
+Build the code into a package and install it. You can then run it using python3 -m shed -f 'path to fragment shader file.
 I'll supply packages when I've worked out how to do CI/CD on github.
 
 ### What it does
