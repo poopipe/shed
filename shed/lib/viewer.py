@@ -87,19 +87,19 @@ class Scene:
         program_attributes = [x for x in self.program if isinstance(self.program[x], moderngl.Attribute)]
         #print('_create_vertex_array')
         #[print('\t', x) for x in program_attributes]
-        
+
         # TODO :
         #   Offering the option of enabling/disabling things like vert color:
         #   This is not straightforward - to support disable/enable vert color:
         #       build vertex shader based on flag
         #       build fragment shader based on flag
-        #       select correct parts of vbo - code for this is here and works 
-        #       but program attributes are defined by both vertex and fragment shader 
-        #       so we'd need to have a more integrated shader build step that covered both
+        #       select correct parts of vbo - code for this is here and works
+        #       but: 
+        #           program attributes are defined by both vertex and fragment shader so shader build needs to include both
+        #           order of program attributes differs on my two machines (linux/AMD : windows/Nvidia)
         #       vertex and fragment shaders rather than keeping them separate as it currently stands
         # for now we simply don't support vertex color in the default vertex and fragment shaders
-        # if the user wants them they can go modifiy the vertex and fragment shader code
-        #
+
         mesh_data_arrays = [
             self.scene_mesh.vertex_positions,
             self.scene_mesh.vertex_texcoords
@@ -107,11 +107,13 @@ class Scene:
         # add vert color if flagged on 
         if self.use_v_color:
             mesh_data_arrays.append(self.scene_mesh.vertex_colors)
-        
+
+
         self.scene_mesh.update_vbo(mesh_data_arrays)
 
-        vao = self.context.vertex_array(self.program, self.scene_mesh.vbo, *program_attributes)
-        #vao = self.context.vertex_array(self.program, self.scene_mesh.vbo, 'in_vertex', 'in_color', 'in_uv')
+        # on windows, building this dynamically isn't working because the order comes out wrong - as such we must explicitly set the order 
+        #vao = self.context.vertex_array(self.program, self.scene_mesh.vbo, *program_attributes)
+        vao = self.context.vertex_array(self.program, self.scene_mesh.vbo, 'in_vertex', 'in_uv')
         return vao
 
     def reload_shader_program(self):
