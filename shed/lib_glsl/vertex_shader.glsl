@@ -10,7 +10,6 @@ out vec2 v_uv;
 
 void main() {
   v_uv = in_uv;
-
   gl_Position = vec4( in_vertex * vec3(in_scale.x, in_scale.y, 1.0), 1.0);
 }
  
