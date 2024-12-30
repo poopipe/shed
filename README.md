@@ -4,12 +4,16 @@ This a bit like shadertoy but you can use your own text editor and it's written 
 
 ### Before you start:
 Build the code into a wheel and install it. Poetry is recommended (and the only thing tested)
-or 
+
+or
+
 Clone and install from source location (dependencies are listed in pyproject.toml)
 
 ### Usage
 Shed is intended to be run as an executable module (like pip, venv etc) 
+
 python3 -m shed --h for help
+
 python3 -m shed -f _frag_path_ to run shed 
 
 If no file matching frag_path is found, you will be asked if you want to create one
