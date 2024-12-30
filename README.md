@@ -15,9 +15,9 @@ python3 -m shed -f _frag_path_ to run shed
 If no file matching frag_path is found, you will be asked if you want to create one
 
 ### Keyboard:
-__S__ Save Image : Saves uint16 png and 32f exr next to input fragment shader
-__D__ Save Fragment Shader : Saves full fragment shader (with includes etc) to text file next to input fragment shader 
-__Esc__ Quit
+* __S__ Save Image : Saves uint16 png and 32f exr next to input fragment shader
+* __D__ Save Fragment Shader : Saves full fragment shader (with includes etc) to text file next to input fragment shader 
+* __Esc__ Quit
 
 ### What it does
 * Runs a window that renders a fragment shader onto a quad
