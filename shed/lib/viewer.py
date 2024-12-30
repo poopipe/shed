@@ -51,7 +51,7 @@ class Scene:
         # window
         self.window_size = pygame.display.get_window_size()
         # shader source file
-        self.fragment_shader_path = fragment_shader_path
+        self.fragment_shader_path = os.path.abspath(fragment_shader_path)
         self.shader_file = ShaderFile.ShaderFile(self.fragment_shader_path)
         self.texture_list = self._get_texture_list(self.shader_file.textures)
         # shader program
@@ -164,13 +164,32 @@ class Scene:
         self.fbo = self.get_frame_buffer()
         self.context.viewport = (0, 0, w, h)
 
-    def save_buffer(self, buffer, path='fbo.exr'):
+    def save_buffer(self, buffer, path='fbo.png'):
+        
+        # make filename from framgent shader path - we will save next to it
+        out_path = os.path.splitext(self.fragment_shader_path)[0]
+        png_path = f'{out_path}_fbo.png'
+        exr_path = f'{out_path}_fbo.exr'
+
         # this is how we save a proper floating point exr with our framebuffer in it to disk
-        print(f'{path} saved')
         raw = buffer.read(components=3, dtype='f4')
         buf = np.frombuffer(raw, dtype='float32')
-        buf = cv2.cvtColor(buf.reshape((*scene.fbo.size[1::-1], 3)), cv2.COLOR_BGR2RGB )
-        cv2.imwrite(path, buf)
+        buf = cv2.cvtColor(buf.reshape((*self.fbo.size[1::-1], 3)), cv2.COLOR_BGR2RGB )
+        # flip vertically
+        buf = np.flip(buf, axis=0)
+
+        # exr can be saved here
+        full_precision_buffer = buf 
+        # apply srgb transform
+        full_precision_buffer = pow(full_precision_buffer, 2.2)
+        cv2.imwrite(exr_path, full_precision_buffer)
+        print(f'{exr_path} saved')
+
+        # to output a 16 bit png we need to scale it
+        png_buffer = np.multiply(buf, 2**16 - 1) # need the -1 otherwise it wraps back round to 0 
+        png_buffer = png_buffer.astype(np.uint16)
+        cv2.imwrite(png_path, png_buffer)
+        print(f'{png_path} saved')
 
     def pick_color(self, pos):
         u_pos, v_pos = pos 
@@ -246,6 +265,8 @@ def main(frag_path):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     scene.reload_shader_program()
+                if event.key == pygame.K_s:
+                    scene.save_buffer(scene.fbo)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
