@@ -167,7 +167,6 @@ class Scene:
         self.context.viewport = (0, 0, w, h)
 
     def save_buffer(self, buffer, path='fbo.png'):
-        
         # make filename from framgent shader path - we will save next to it
         out_path = os.path.splitext(self.fragment_shader_path)[0]
         png_path = f'{out_path}_fbo.png'
@@ -193,16 +192,26 @@ class Scene:
         cv2.imwrite(png_path, png_buffer)
         print(f'{png_path} saved')
 
+    def save_fragment(self):
+        out_path = os.path.splitext(self.fragment_shader_path)[0]
+        out_path = f'{out_path}_full.glsl'
+        if os.path.exists(out_path):
+            os.remove(out_path)
+        with open(out_path, 'w') as f:
+            f.write(self.shader.fs)
+            print(f'{out_path} saved')
+        pass
+
     def pick_color(self, pos):
         u_pos, v_pos = pos 
         raw = self.fbo.read(components=3, dtype='f4')  # pull data from fbo
         # read result into numpy array cos that's a way to get actual numbers that I know about
         buf = np.frombuffer(raw, dtype='float32')
         # reshape to 2d array with 3 component lists in it
-        data = buf.reshape((*self.fbo.size[1::-1], 3))
+        buf = buf.reshape((*self.fbo.size[1::-1], 3))
         # flip the Y axis because mouse position starts at top and openGL does not
-        data = np.flip(data, axis=0)
-        value = data[v_pos][u_pos]
+        buf = np.flip(buf, axis=0)
+        value = buf[v_pos][u_pos]
         print(f'mouse: ({u_pos}, {v_pos}) color: ({value[0]}, {value[1]}, {value[2]})')
 
     def _get_shader_file_watchers(self):
@@ -251,27 +260,30 @@ def main(frag_path):
     clock = pygame.time.Clock()
     start_time = time.time()
 
-
     scene = Scene(fragment_shader_path = frag_path)
 
     WATCH_FILE = pygame.USEREVENT+1
     pygame.time.set_timer(WATCH_FILE, 30)
 
-
-    while True:
+    should_run = True
+    
+    while should_run:
         clock.tick(60)
         mouse_pressed = False
         mouse_released = False
 
         for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                should_run = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
                     scene.reload_shader_program()
                 if event.key == pygame.K_s:
                     scene.save_buffer(scene.fbo)
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                if event.key == pygame.K_d:
+                    scene.save_fragment()
+                if event.key == pygame.K_ESCAPE:
+                    should_run = False
             if event.type == pygame.VIDEORESIZE:
                 scene.window_size = pygame.display.get_window_size()
                 scene.set_display_scale()
@@ -294,6 +306,8 @@ def main(frag_path):
         scene.render()
         pygame.display.flip()
 
+    pygame.quit()
+    sys.exit()
 
 if __name__ == '__main__':
     main('fragment_shader.glsl')

@@ -5,7 +5,12 @@ from .lib import viewer
 
 from . import LIB_GLSL_ROOT
 
-parser = argparse.ArgumentParser()
+
+parser = argparse.ArgumentParser(
+    prog = 'shed',
+    description = 'smol shader editor.',
+    epilog = '[S]: Save image [D]: Save full fragment shader [Esc]: Quit'
+)
 parser.add_argument('-f', '--fragment_file', type=str, help='path to fragment shader file')
 args = parser.parse_args()
 

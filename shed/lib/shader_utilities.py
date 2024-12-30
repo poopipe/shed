@@ -110,6 +110,7 @@ class Shader:
         # print s with line numbers
         lines = s.splitlines()
         [print(f'{str(i+1).ljust(4)} {lines[i]}') for i in range(len(lines))]
+        return lines
 
     def _get_program(self):
         if not self.context:
