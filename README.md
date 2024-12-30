@@ -11,11 +11,8 @@ Clone and install from source location (dependencies are listed in pyproject.tom
 
 ### Usage
 Shed is intended to be run as an executable module (like pip, venv etc) 
-
-python3 -m shed --h for help
-
-python3 -m shed -f _frag_path_ to run shed 
-
+* python3 -m shed --h for help
+* python3 -m shed -f _frag_path_ to run shed 
 If no file matching frag_path is found, you will be asked if you want to create one
 
 ### Keyboard:
@@ -43,7 +40,7 @@ If no file matching frag_path is found, you will be asked if you want to create 
 out_color = vec4(1.0, 1.0, 1.0, v_uv.x);
 ```
 ### Dependencies
-python = "^3.12"
-moderngl = "^5.12.0"
-pygame-ce = "^2.5.2"
-opencv-python = "^4.10.0.84"
+* python = "^3.12"
+* moderngl = "^5.12.0"
+* pygame-ce = "^2.5.2"
+* opencv-python = "^4.10.0.84"
