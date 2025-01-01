@@ -27,7 +27,6 @@ Shed is intended to be run as an executable module (like pip, venv etc)
 * Supports #include statements. These load from libglsl folder - a number are supplied
 
 ### What is currently broken:
-* Texture samplers are not handled during shader reload, you must restart shed if you add or modify Texture Samplers
 * you must make use of v_uv in your fragment shader somewhere. If you don't need it for anything, you can stuff it into the out_color alpha since that has no effect.\
 eg.
 ```

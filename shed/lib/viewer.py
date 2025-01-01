@@ -118,10 +118,11 @@ class Scene:
 
     def reload_shader_program(self):
         # TODO:
-        # Handle Textures during shader load - currently doesn't work
+        # It is beginning to look like we might as weLL just re-init the whole lot on reload 
         try:
             self.shader_file = ShaderFile.ShaderFile(self.fragment_shader_path)
             self.shader = shader_utilities.Shader(self.context, self.fragment_shader_path, self.shader_file, self.use_v_color)
+            self.texture_list = self._get_texture_list(self.shader_file.textures)
             self.program = self.shader.program
             print('fragment shader loaded:')
         except Exception as e:
