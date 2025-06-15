@@ -29,8 +29,7 @@ Shed is intended to be run as an executable module (like pip, venv etc)
 ### Includes
 You can use includes to pull shader code from other glsl files into your shader. Several libraries are included.
 
-These files must live in ./shed/lib_glsl and are declared as follo
-ws
+These files must live in ./shed/lib_glsl and are declared as follows
 ```
 #include f_core
 ```
