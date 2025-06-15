@@ -28,6 +28,7 @@ class ImageTexture:
         self.sampler:moderngl.Sampler = self.context.sampler(texture = self.texture)
 
     def _load(self)->moderngl.Texture:
+        print(self.path)
         img:np.ndarray = cv2.imread(self.path)
         img:np.ndarray = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # optional
         #img = np.flip(img, 0).copy(order='C')      # optional

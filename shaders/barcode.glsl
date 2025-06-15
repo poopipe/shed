@@ -23,7 +23,6 @@ void main() {
   // On windows AMD this bullshit does not happen 
 
   // white screen = 
-  out_color = vec4(v_color, 1.0) + vec4(saturate(v_uv.x - 1.0), saturate(v_uv.y - 1.0), 0.0, 0.0);
 
   float cells = 33;
   vec2 pos = floor(v_uv * cells);
@@ -43,7 +42,7 @@ void main() {
   vec3 col = gradient_ramp(c);
   col *= mod(pos.y, 2.0);
 
-  out_color *= vec4(col, 1.0); 
+  out_color = vec4(col, 1.0); 
   //out_color *= vec4(row_offset, row_offset, row_offset, 0.0);
   //c *= mod(pos.y,  4.0);
   //out_color *= vec4(c, c, c, 0.0);
