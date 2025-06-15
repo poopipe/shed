@@ -2,29 +2,18 @@
 import os
 
 def load_file_as_lines(p:str) -> list:
-    try:
-        if os.path.exists(p):
-            with open(p) as f:
-                #return [x.strip() for x in f.readlines()]
-                return [x.rstrip() for x in f.readlines()]  # trying with rstrip cos it maintains indent - cant remember why i didn't initially though
-        else:
-            return None
-    except FileNotFoundError as e:
-        print(e)
-        return None
+    if not os.path.exists(p):
+        raise FileNotFoundError(f'{p} not found')
+    with open(p) as f:
+        return [x.rstrip() for x in f.readlines()]  
 
 
 def load_file_as_string(p:str) -> str:
-    try:
-        if os.path.exists(p):
-            with open(p) as f:
-                s = f.read()
-            return s
-        else:
-            return None
-    except FileNotFoundError as e:
-        print(e)
-        return None
+    if not os.path.exists(p):
+        raise FileNotFoundError(f'{p} not found')
+    with open(p) as f:
+        s = f.read()
+        return s
 
 class FileWatcher():
     def __init__(self, p):

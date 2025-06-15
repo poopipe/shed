@@ -1,5 +1,6 @@
 import os
 
+
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 os.environ["OPENCV_IO_ENABLE_OPENEXR"]="1"
 os.environ['SDL_WINDOWS_DPI_AWARENESS'] = 'permonitorv2'
@@ -11,76 +12,73 @@ import pygame
 import time
 import cv2
 
-from . import file_utilities
-from . import shader_utilities
-from . import mesh_utilities
-from . import ShaderFile
-from .. import LIB_GLSL_ROOT
-from .. import LIB_RESOURCE_ROOT
+from shed.lib.shader_utilities import Shader
+
+from shed.lib import mesh_utilities
+from shed.lib.ShaderFile import ShaderFile
+from shed.lib.file_utilities import FileWatcher
+from shed import LIB_GLSL_ROOT
+from shed import LIB_RESOURCE_ROOT
 
 class ImageTexture:
-    def __init__(self, path):
-        self.context = moderngl.get_context()
-        self.path = path
-        self.texture = self._load()
-        self.sampler = self.context.sampler(texture = self.texture)
+    def __init__(self, path)->None:
+        self.context:moderngl.Context = moderngl.get_context()
+        self.path:str = path
+        self.texture:moderngl.Texture = self._load()
+        self.sampler:moderngl.Sampler = self.context.sampler(texture = self.texture)
 
-    def _load(self):
-        try:
-            img = cv2.imread(self.path)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # optional
-            #img = np.flip(img, 0).copy(order='C')      # optional
-            return self.context.texture(img.shape[1::-1], img.shape[2], img)
-        except Exception as e:
-            print(f'Failed to load texture {self.path}')
-            print(e)
+    def _load(self)->moderngl.Texture:
+        img:np.ndarray = cv2.imread(self.path)
+        img:np.ndarray = cv2.cvtColor(img, cv2.COLOR_BGR2RGB) # optional
+        #img = np.flip(img, 0).copy(order='C')      # optional
+        return self.context.texture(img.shape[1::-1], img.shape[2], img)
 
-    def use(self, id):
+    def use(self, id)->None:
         self.sampler.use(id)
 
 
 class Scene:
     def __init__(self, fragment_shader_path=os.path.join(LIB_GLSL_ROOT,'fragment_shader.glsl')):
-        self.context = moderngl.get_context()
+        self.context:moderngl.Context = moderngl.get_context()
         # global flags
-        self.use_v_color = False    # DO NOT USE : leaving in place in case i decide to make it work properly
+        self.use_v_color:bool = False    # DO NOT USE : leaving in place in case i decide to make it work properly
 
         # uniforms
-        self.u_time = 1.0
-        self.u_scale = [1.0, 1.0]
+        self.u_time:float = 1.0
+        self.u_scale:list[float] = [1.0, 1.0]
         # window
-        self.window_size = pygame.display.get_window_size()
+        self.window_size:tuple[int, int] = pygame.display.get_window_size()
         # shader source file
-        self.fragment_shader_path = os.path.abspath(fragment_shader_path)
-        self.shader_file = ShaderFile.ShaderFile(self.fragment_shader_path)
-        self.texture_list = self._get_texture_list(self.shader_file.textures)
+        self.fragment_shader_path:str = os.path.abspath(fragment_shader_path)
+        self.shader_file:ShaderFile = ShaderFile(self.fragment_shader_path)
+        self.texture_list:list[ImageTexture] = self._get_texture_list(self.shader_file.textures)
         # shader program
-        self.shader = shader_utilities.Shader(self.context, self.fragment_shader_path, self.shader_file, self.use_v_color)
+        self.shader:Shader = Shader(self.context, self.fragment_shader_path, self.shader_file, self.use_v_color)
         self.program = self.shader.program  # TODO : this needs to come from self.shader_file
+        
         # framebuffer
         self.fbo = self.get_frame_buffer()
         # file watching
         self.shader_file_watchers = self._get_shader_file_watchers()
         # scene
         self.scene_mesh = mesh_utilities.Mesh(self.context)
+        
         # handle textures being there or not there 
         try:
             self.vao = self._create_vertex_array()
-            if self.texture_list:
+            if len(self.texture_list) > 0:
                 for i in range(len(self.texture_list)):
                     if f'Texture{i}' in self.program:
                         self.program[f'Texture{i}'].value = i
                         self.texture_list[i].use(i)
+        
         except Exception as e:
             print('Fatal error in Shader Program')
             print(e)
             exit(1)
 
-    def _get_texture_list(self, paths:list)->list:
-        if paths :
-            return [ImageTexture(x) for x in paths]
-        else:
-            return None
+    def _get_texture_list(self, paths:list[str])->list[ImageTexture]:
+        return [ImageTexture(x) for x in paths]
 
     def _create_vertex_array(self):
         # get attributes listed in shader program 
@@ -120,8 +118,8 @@ class Scene:
         # TODO:
         # It is beginning to look like we might as weLL just re-init the whole lot on reload 
         try:
-            self.shader_file = ShaderFile.ShaderFile(self.fragment_shader_path)
-            self.shader = shader_utilities.Shader(self.context, self.fragment_shader_path, self.shader_file, self.use_v_color)
+            self.shader_file = ShaderFile(self.fragment_shader_path)
+            self.shader = Shader(self.context, self.fragment_shader_path, self.shader_file, self.use_v_color)
             self.texture_list = self._get_texture_list(self.shader_file.textures)
             self.program = self.shader.program
             print('fragment shader loaded:')
@@ -222,7 +220,7 @@ class Scene:
             file_list = []
         file_list.append(self.shader.fs_path)
         return[
-            file_utilities.FileWatcher(x) for x in file_list
+            FileWatcher(x) for x in file_list
         ]
 
     def watched_file_changed(self):

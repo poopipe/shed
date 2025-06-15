@@ -1,6 +1,8 @@
-from . import file_utilities
 import os
-from .. import LIB_GLSL_ROOT
+
+from shed.lib.exceptions import GLContextError
+from shed.lib.file_utilities import load_file_as_string
+from shed import LIB_GLSL_ROOT
 
 class Shader:
     def __init__(self, context, fragment_shader_path, shader_file, use_v_color):
@@ -30,35 +32,23 @@ class Shader:
 
     def _build_fragment_shader(self) -> str:
         # pre load all the fragment shader code - any failures here will return False 
-
-        preamble = file_utilities.load_file_as_string(self.fs_preamble)
+        preamble = load_file_as_string(self.fs_preamble)
         textures = self.fs_textures
         includes = self.fs_includes
 
         body = '\n'.join(self.fs_lines)
 
         s = ''
-        # build string, return False if preamble or body fail, includes are 'non-critical'
-        if preamble:
-            s = f'{s}{preamble}\n'
-            if includes:
-                for i in includes:
-                    include_path = os.path.join(LIB_GLSL_ROOT, f'{i}.glsl')
-                    #file_string = file_utilities.load_file_as_string(include_path)
-                    #if file_string is not None:    # No idea how but we were getting the  main fragment
-                                                    # shader path including extension in this list which
-                                                    # caused load_file_as_string to return None
-                                                    # this appears to no longer be a problem 
-                    s = f'{s}{file_utilities.load_file_as_string(include_path)}\n'
-            if textures:
-                for i in range(len(textures)):
-                    s = f'{s}uniform sampler2D Texture{i};\n'
-            if body:
-                s = f'{s}\n{body}'
-            else:
-                return False
-        else:
-            return False
+        s = f'{s}{preamble}\n'
+        if includes:
+            for i in includes:
+                include_path = os.path.join(LIB_GLSL_ROOT, f'{i}.glsl')
+                s = f'{s}{load_file_as_string(include_path)}\n'
+        if textures:
+            for i in range(len(textures)):
+                s = f'{s}uniform sampler2D Texture{i};\n'
+        if body:
+            s = f'{s}\n{body}'
         return s
 
     def _build_vertex_shader(self) -> str:
@@ -102,7 +92,6 @@ class Shader:
             '}'
         ])
 
-        #vs_string = file_utilities.load_file_as_string(self.vs_path)
         vs_string = ''.join(vs_lines)
         return(vs_string)
 
@@ -114,24 +103,17 @@ class Shader:
 
     def _get_program(self):
         if not self.context:
-            return False
-        try:
-            vs = file_utilities.load_file_as_string(self.vs_path)
-            fs = self.fs
-            
-            #self.debug_print(fs)
+            raise GLContextError(f'error creating shader program for {self.fs_path}') 
+        
+        vs = load_file_as_string(self.vs_path)
+        fs = self.fs
+        #self.debug_print(vs)
+        self.debug_print(fs)
+        program = self.context.program(
+            vertex_shader = vs,
+            fragment_shader= fs
+        )
+        return program
 
-            if fs and vs:
-                program = self.context.program(
-                    vertex_shader = vs,
-                    fragment_shader= fs
-                )
-            return program
-
-        except Exception as e:
-            print('Error getting shader program')
-            print(e)
-
-        return False
 
 

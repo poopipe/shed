@@ -1,4 +1,5 @@
-from . import file_utilities
+from shed.lib.exceptions import ShedException, NoTokensError
+from shed.lib.file_utilities import load_file_as_lines
 
 
 
@@ -13,27 +14,27 @@ class ShaderFile:
         self.body = self._get_body()                        # remainder of file
 
     def _get_lines(self, p):
-        return file_utilities.load_file_as_lines(p)
+        return load_file_as_lines(p)
 
-    def _get_token_lines(self, lines, token):
-        tokens = None
+    def _get_token_lines(self, lines:list[str], token:str) -> tuple[list[str], list[str]]:
+        tokens = []
         for i in reversed(range(len(lines))):
             if lines[i].startswith(token):
                 line = lines[i]
+                t = line.split(token)
                 t = f'{line.split(token)[1].strip()}'
-                if not tokens:
-                    tokens = [t]
-                elif not t in tokens:
-                    tokens.append(t)
+                tokens.append(t)
                 lines[i] = f'//{lines[i]}'
-        if tokens and len(tokens) > 0:
-            tokens = list(reversed(tokens))
+        
+        if len(tokens) <= 0:
+            return [], lines 
+        tokens = list(reversed(tokens))
         return tokens, lines
 
     def _get_includes(self):
         return self._get_token_lines(self.lines, '#include')
 
-    def _get_textures(self):
+    def _get_textures(self)->tuple[list[str],list[str]]:
         return self._get_token_lines(self.lines, '#texture')
 
     def _get_uniforms(self):
@@ -46,6 +47,6 @@ class ShaderFile:
         return self._get_token_lines(self.lines, 'out ')
 
     def _get_body(self):
-        pass
+        return self.lines
 
 
