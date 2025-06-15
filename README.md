@@ -26,12 +26,25 @@ Shed is intended to be run as an executable module (like pip, venv etc)
 * Supports _n_ textures (I have no idea how many)
 * Supports #include statements. These load from libglsl folder - a number are supplied
 
-### What is currently broken:
-* you must make use of v_uv in your fragment shader somewhere. If you don't need it for anything, you can stuff it into the out_color alpha since that has no effect.\
-eg.
+### Includes
+You can use includes to pull shader code from other glsl files into your shader. Several libraries are included.
+
+These files must live in ./shed/lib_glsl and are declared as follo
+ws
 ```
-out_color = vec4(1.0, 1.0, 1.0, v_uv.x);
+# include f_core
 ```
+
+### Textures
+Textures can be included in your shader. A sampler will be created for each declared Texture (Texture0, Texture1 etc)
+
+Presently these must be declared with a path relative to cwd - or an absolute path - path handling is not yet robust.
+
+Any texture format supported by opencv should work fine but everyone knows that winners use .png
+```
+# texture c:\mystuff\mytexture.png
+```
+
 ### Dependencies
 * python = "^3.12"
 * moderngl = "^5.12.0"
