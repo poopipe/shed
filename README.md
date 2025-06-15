@@ -32,7 +32,7 @@ You can use includes to pull shader code from other glsl files into your shader.
 These files must live in ./shed/lib_glsl and are declared as follo
 ws
 ```
-# include f_core
+#include f_core
 ```
 
 ### Textures
@@ -42,7 +42,7 @@ Presently these must be declared with a path relative to cwd - or an absolute pa
 
 Any texture format supported by opencv should work fine but everyone knows that winners use .png
 ```
-# texture c:\mystuff\mytexture.png
+#texture c:\mystuff\mytexture.png
 ```
 
 ### Dependencies
